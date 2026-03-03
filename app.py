@@ -1,12 +1,37 @@
 from flask import Flask, request, render_template, jsonify
 import yt_dlp
+import requests
 
 app = Flask(__name__)
 
+def get_tiktok_url(url):
+    """শুধুমাত্র টিকটকের জন্য বিশেষ API (যাতে IP ব্লক না হয় এবং Watermark না থাকে)"""
+    try:
+        api_url = f"https://www.tikwm.com/api/?url={url}"
+        response = requests.get(api_url).json()
+        
+        if response.get('code') == 0:
+            data = response['data']
+            return {
+                'status': 'success',
+                'title': data.get('title', 'TikTok Video'),
+                'thumbnail': data.get('cover', ''),
+                'download_url': data.get('play', ''), # play মানে ওয়াটারমার্ক ছাড়া ভিডিও
+                'platform': 'TikTok'
+            }
+        return {'status': 'error', 'message': 'TikTok video not found or private!'}
+    except Exception as e:
+        return {'status': 'error', 'message': str(e)}
+
 def get_direct_url(url):
-    """সার্ভারে ডাউনলোড না করে সরাসরি ভিডিওর লিংক বের করার ফাংশন"""
+    """অন্যান্য সোশ্যাল মিডিয়ার জন্য yt-dlp"""
+    
+    # যদি টিকটকের লিংক হয়, তবে আমাদের স্পেশাল ফাংশনে পাঠাবে
+    if 'tiktok.com' in url.lower():
+        return get_tiktok_url(url)
+        
     ydl_opts = {
-        'skip_download': True, # ভিডিও সার্ভারে সেভ হবে না
+        'skip_download': True,
         'quiet': True,
         'no_warnings': True,
         'format': 'best'
@@ -16,7 +41,6 @@ def get_direct_url(url):
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
             
-            # প্লেলিস্ট হলে প্রথম ভিডিওর ইনফো নিবে
             if 'entries' in info:
                 info = info['entries'][0]
                 
@@ -24,7 +48,6 @@ def get_direct_url(url):
             thumbnail = info.get('thumbnail', '')
             platform = info.get('extractor_key', 'Unknown')
             
-            # ডাইরেক্ট ডাউনলোড লিংক বের করা
             direct_url = info.get('url')
             if not direct_url and 'requested_downloads' in info:
                 direct_url = info['requested_downloads'][0].get('url')
