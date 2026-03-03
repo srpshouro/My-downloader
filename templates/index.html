@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Social Media Downloader</title>
+    <title>Pro Media Downloader</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         :root {
@@ -13,71 +13,116 @@
             --success: #10b981; --error: #ef4444; --border-light: #262626;
             --glass: rgba(255, 255, 255, 0.05);
         }
-        body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-primary); margin: 0; padding: 0; }
-        .container { max-width: 600px; margin: 4rem auto; padding: 2rem; background: var(--glass); border-radius: 1.5rem; border: 1px solid var(--border-light); text-align: center; }
-        .title { font-size: 2.5rem; color: var(--accent); margin-bottom: 0.5rem; font-weight: bold; }
-        .input-field { width: 90%; padding: 1rem; border-radius: 1rem; border: 1px solid var(--border-light); background: var(--bg-secondary); color: white; margin-bottom: 1rem; font-size: 1rem; }
-        .btn { background: var(--accent); color: white; border: none; padding: 1rem 2rem; border-radius: 1rem; font-size: 1rem; cursor: pointer; transition: 0.3s; width: 95%; font-weight: bold; }
-        .btn:hover { background: var(--accent-hover); }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .status { margin-top: 1.5rem; font-size: 1rem; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-primary); margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .container { width: 90%; max-width: 600px; padding: 2.5rem; background: var(--glass); border-radius: 1.5rem; border: 1px solid var(--border-light); text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .title { font-size: 2.5rem; background: linear-gradient(135deg, var(--accent), #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.5rem; font-weight: bold; }
+        .input-field { width: 100%; box-sizing: border-box; padding: 1.2rem; border-radius: 1rem; border: 1px solid var(--border-light); background: var(--bg-secondary); color: white; margin-bottom: 1.5rem; font-size: 1rem; outline: none; }
+        .input-field:focus { border-color: var(--accent); }
+        .btn { background: linear-gradient(135deg, var(--accent), var(--accent-hover)); color: white; border: none; padding: 1.2rem; border-radius: 1rem; font-size: 1.1rem; cursor: pointer; transition: 0.3s; width: 100%; font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+        .status { margin-top: 1.5rem; font-size: 1rem; padding: 1rem; border-radius: 0.5rem; display: none; }
+        .success-box { background: rgba(16, 185, 129, 0.1); border: 1px solid var(--success); color: var(--success); }
+        .error-box { background: rgba(239, 68, 68, 0.1); border: 1px solid var(--error); color: var(--error); }
     </style>
 </head>
 <body>
+
     <div class="container">
-        <div class="title">Downloader</div>
-        <p style="color: var(--text-secondary); margin-bottom: 2rem;">Download videos directly to your device</p>
+        <div class="title">Pro Downloader</div>
+        <p style="color: var(--text-secondary); margin-bottom: 2rem;">YouTube, TikTok, Facebook, Instagram & more!</p>
         
-        <input type="url" id="video-url" class="input-field" placeholder="Paste YouTube, TikTok or FB link here..." />
+        <input type="url" id="video-url" class="input-field" placeholder="Paste any video link here..." autocomplete="off" />
         
-        <button class="btn" id="download-btn" onclick="startDownload()">
-            <span id="btn-text">Download Now</span>
+        <button class="btn" id="download-btn" onclick="processDownload()">
+            <span id="btn-text">Download Video</span>
         </button>
         
-        <div id="status-container" class="status"></div>
+        <div id="status-box" class="status"></div>
     </div>
 
     <script>
-        async function startDownload() {
-            const url = document.getElementById('video-url').value.trim();
-            const statusDiv = document.getElementById('status-container');
-            const button = document.getElementById('download-btn');
+        async function processDownload() {
+            const urlInput = document.getElementById('video-url').value.trim();
+            const btn = document.getElementById('download-btn');
             const btnText = document.getElementById('btn-text');
-            
-            if (!url) {
-                statusDiv.innerHTML = `<span style="color: var(--error);">Please enter a valid URL</span>`;
+            const statusBox = document.getElementById('status-box');
+
+            if (!urlInput) {
+                showStatus('Please paste a valid video link!', 'error');
                 return;
             }
-            
-            btnText.textContent = 'Processing... Please wait';
-            button.disabled = true;
-            statusDiv.innerHTML = '';
-            
+
+            // Loading state
+            btn.disabled = true;
+            btnText.innerHTML = '⏳ Processing (Please wait)...';
+            statusBox.style.display = 'none';
+
             try {
-                const response = await fetch('/extract', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url })
-                });
-                
-                const result = await response.json();
-                
-                if (result.status === 'success') {
-                    statusDiv.innerHTML = `<span style="color: var(--success);">✅ Found it! Downloading: ${result.title}...</span>`;
+                let downloadUrl = '';
+
+                // 1. TIKTOK API (TikWM - No Watermark)
+                if (urlInput.includes('tiktok.com')) {
+                    const res = await fetch(`https://www.tikwm.com/api/?url=${urlInput}`);
+                    const data = await res.json();
                     
-                    // এই লাইনটি ব্রাউজারকে ফাইলটি ফিজিক্যালি ফোনে ডাউনলোড করতে বাধ্য করবে
-                    window.location.href = result.proxy_url; 
-                } else {
-                    statusDiv.innerHTML = `<span style="color: var(--error);">❌ Error: ${result.message}</span>`;
+                    if (data.code === 0 && data.data && data.data.play) {
+                        downloadUrl = data.data.play;
+                    } else {
+                        throw new Error("TikTok video is private or deleted.");
+                    }
+                } 
+                // 2. ALL OTHER PLATFORMS (YouTube, FB, Insta -> Cobalt API)
+                else {
+                    const res = await fetch('https://api.cobalt.tools/api/json', {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            url: urlInput,
+                            filenamePattern: 'classic'
+                        })
+                    });
+
+                    if (!res.ok) throw new Error("Video not found or API blocked.");
+                    
+                    const data = await res.json();
+                    if (data.status === 'error') throw new Error(data.text || "Error processing video.");
+                    
+                    downloadUrl = data.url;
                 }
+
+                if (downloadUrl) {
+                    showStatus('✅ Video ready! Downloading to your device...', 'success');
+                    
+                    // Force Download to Local Storage
+                    const a = document.createElement('a');
+                    a.href = downloadUrl;
+                    a.setAttribute('download', 'video.mp4'); 
+                    a.setAttribute('target', '_blank'); 
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+
+                    // Reset input
+                    setTimeout(() => { document.getElementById('video-url').value = ''; }, 2000);
+                }
+
             } catch (error) {
-                statusDiv.innerHTML = `<span style="color: var(--error);">❌ Network error occurred!</span>`;
+                showStatus(`❌ Error: ${error.message}`, 'error');
             } finally {
-                setTimeout(() => {
-                    btnText.textContent = 'Download Now';
-                    button.disabled = false;
-                }, 3000);
+                btn.disabled = false;
+                btnText.innerHTML = 'Download Video';
             }
+        }
+
+        function showStatus(message, type) {
+            const box = document.getElementById('status-box');
+            box.textContent = message;
+            box.className = `status ${type === 'error' ? 'error-box' : 'success-box'}`;
+            box.style.display = 'block';
         }
     </script>
 </body>
