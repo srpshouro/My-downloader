@@ -16,7 +16,7 @@ def get_tiktok_url(url):
                 'status': 'success',
                 'title': data.get('title', 'TikTok Video'),
                 'thumbnail': data.get('cover', ''),
-                'download_url': data.get('play', ''), # play মানে ওয়াটারমার্ক ছাড়া ভিডিও
+                'download_url': data.get('play', ''), 
                 'platform': 'TikTok'
             }
         return {'status': 'error', 'message': 'TikTok video not found or private!'}
@@ -34,13 +34,20 @@ def get_direct_url(url):
         'skip_download': True,
         'quiet': True,
         'no_warnings': True,
-        'format': 'best'
+        'format': 'best',
+        # ইউটিউবকে বোকা বানানোর জন্য Android Client ব্যবহার করছি
+        'extractor_args': {
+            'youtube': {
+                'player_client': ['android', 'ios']
+            }
+        }
     }
     
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
             
+            # প্লেলিস্ট হলে প্রথম ভিডিওর ইনফো নিবে
             if 'entries' in info:
                 info = info['entries'][0]
                 
