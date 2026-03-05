@@ -3,92 +3,191 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Custom Downloader</title>
+    <title>All Media Downloader Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        :root {
-            --bg-primary: #0a0a0a; --bg-secondary: #111111; --bg-card: #1a1a1a;
-            --text-primary: #ffffff; --text-secondary: #a3a3a3;
-            --accent: #8b5cf6; --accent-hover: #7c3aed;
-            --success: #10b981; --error: #ef4444; --border-light: #262626;
-            --glass: rgba(255, 255, 255, 0.05);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
         }
-        body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-primary); margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .container { width: 90%; max-width: 600px; padding: 2.5rem; background: var(--glass); border-radius: 1.5rem; border: 1px solid var(--border-light); text-align: center; }
-        .title { font-size: 2.5rem; color: var(--accent); margin-bottom: 0.5rem; font-weight: bold; }
-        .input-field { width: 100%; box-sizing: border-box; padding: 1.2rem; border-radius: 1rem; border: 1px solid var(--border-light); background: var(--bg-secondary); color: white; margin-bottom: 1.5rem; font-size: 1rem; outline: none; }
-        .btn { background: var(--accent); color: white; border: none; padding: 1.2rem; border-radius: 1rem; font-size: 1.1rem; cursor: pointer; transition: 0.3s; width: 100%; font-weight: bold; }
-        .btn:hover { background: var(--accent-hover); }
-        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-        .status { margin-top: 1.5rem; padding: 1rem; border-radius: 0.5rem; display: none; }
-        .success-box { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid var(--success); }
-        .error-box { background: rgba(239, 68, 68, 0.1); color: var(--error); border: 1px solid var(--error); }
-        .download-btn-green { display: inline-block; background: var(--success); color: white; padding: 10px 20px; text-decoration: none; border-radius: 8px; margin-top: 10px; font-weight: bold; }
+        body {
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        h2 {
+            margin-bottom: 10px;
+            font-size: 24px;
+            color: #00e5ff;
+        }
+        p.subtitle {
+            font-size: 14px;
+            color: #ccc;
+            margin-bottom: 25px;
+        }
+        input {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            outline: none;
+            font-size: 16px;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            background: #00e5ff;
+            color: #000;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+        button:hover {
+            background: #00b8cc;
+        }
+        #loader {
+            display: none;
+            margin-top: 20px;
+            font-size: 16px;
+            color: #ffeb3b;
+        }
+        #result {
+            margin-top: 25px;
+            display: none;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .cover-img {
+            width: 100%;
+            max-height: 250px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .video-title {
+            font-size: 14px;
+            margin-bottom: 15px;
+            color: #eee;
+        }
+        .download-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: #4caf50;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .download-btn:hover { background: #45a049; }
+        .audio-btn { background: #ff9800; }
+        .audio-btn:hover { background: #e68a00; }
+        .error-msg { color: #ff4c4c; font-weight: 600; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <div class="title">All-in-One Downloader</div>
-        <p style="color: var(--text-secondary); margin-bottom: 2rem;">Powered by Custom API</p>
-        
-        <input type="url" id="video-url" class="input-field" placeholder="Paste YouTube, TikTok or FB link here..." />
-        
-        <button class="btn" id="download-btn" onclick="fetchFromMyAPI()">
-            <span id="btn-text">Get Download Link</span>
-        </button>
-        
-        <div id="status-box" class="status"></div>
+        <h2>🔥 All Media Downloader</h2>
+        <p class="subtitle">Download from TikTok, FB, IG, YouTube & X</p>
+
+        <input type="url" id="videoUrl" placeholder="Paste your video link here...">
+        <button onclick="fetchMedia()">Get Download Links</button>
+
+        <div id="loader">⏳ Wait bro, fetching data...</div>
+
+        <div id="result">
+            <!-- Data will be injected here by JS -->
+        </div>
     </div>
 
     <script>
-        async function fetchFromMyAPI() {
-            const urlInput = document.getElementById('video-url').value.trim();
-            const btn = document.getElementById('download-btn');
-            const btnText = document.getElementById('btn-text');
-            const statusBox = document.getElementById('status-box');
+        // আপনার Vercel API এর লিংক
+        const API_BASE_URL = "https://all-media-api.vercel.app/api/download?url=";
 
+        async function fetchMedia() {
+            const urlInput = document.getElementById("videoUrl").value.trim();
+            const resultDiv = document.getElementById("result");
+            const loader = document.getElementById("loader");
+
+            // যদি ইনপুট খালি থাকে
             if (!urlInput) {
-                showStatus('Please paste a link first!', 'error');
+                alert("Bro, please paste a valid link first!");
                 return;
             }
 
-            btn.disabled = true;
-            btnText.innerHTML = '⏳ Processing with API...';
-            statusBox.style.display = 'none';
+            // লোডার দেখানো এবং আগের রেজাল্ট হাইড করা
+            loader.style.display = "block";
+            resultDiv.style.display = "none";
+            resultDiv.innerHTML = "";
 
             try {
-                // 🚀 আপনার নিজের API তে রিকোয়েস্ট পাঠানো হচ্ছে
-                const response = await fetch(`/alldown?url=${encodeURIComponent(urlInput)}`);
+                // আপনার API তে রিকোয়েস্ট পাঠানো
+                const response = await fetch(API_BASE_URL + encodeURIComponent(urlInput));
                 const data = await response.json();
 
-                if (data.status === true) {
-                    const finalLink = data.watermark_free_video || data.download_link;
+                loader.style.display = "none";
+                resultDiv.style.display = "block";
+
+                if (data.success) {
+                    const media = data.data;
                     
-                    statusBox.innerHTML = `
-                        <strong>✅ Success!</strong><br>
-                        Platform: ${data.platform}<br>
-                        <a href="${finalLink}" class="download-btn-green" target="_blank" rel="noopener noreferrer">⬇️ Click to Download</a>
-                    `;
-                    statusBox.className = 'status success-box';
-                    statusBox.style.display = 'block';
+                    // টিকটকের জন্য ডিজাইন
+                    if (media.platform === "TikTok") {
+                        resultDiv.innerHTML = `
+                            ${media.cover_image ? `<img src="${media.cover_image}" class="cover-img" alt="Cover">` : ''}
+                            <div class="video-title">${media.title || 'TikTok Video'}</div>
+                            
+                            <a href="${media.video_no_watermark}" target="_blank" class="download-btn">🎬 Download (No Watermark)</a>
+                            <a href="${media.video_watermark}" target="_blank" class="download-btn" style="background: #2196F3;">💧 Download (With Watermark)</a>
+                            ${media.music_url ? `<a href="${media.music_url}" target="_blank" class="download-btn audio-btn">🎵 Download Audio (MP3)</a>` : ''}
+                        `;
+                    } 
+                    // অন্যান্য সাইটের (FB/IG/YT) জন্য ডিজাইন
+                    else {
+                        resultDiv.innerHTML = `
+                            <div class="video-title">Ready to download!</div>
+                            <a href="${media.video_url}" target="_blank" class="download-btn">⬇️ Download Video</a>
+                        `;
+                    }
                 } else {
-                    showStatus(`❌ API Error: ${data.message}`, 'error');
+                    // API থেকে Error আসলে
+                    resultDiv.innerHTML = `<p class="error-msg">❌ Error: ${data.message || 'Failed to fetch video!'}</p>`;
                 }
             } catch (error) {
-                showStatus(`❌ Network Error!`, 'error');
-            } finally {
-                btn.disabled = false;
-                btnText.innerHTML = 'Get Download Link';
+                // নেটওয়ার্ক বা সার্ভার Error
+                loader.style.display = "none";
+                resultDiv.style.display = "block";
+                resultDiv.innerHTML = `<p class="error-msg">❌ Server error! Please try again later.</p>`;
             }
         }
-
-        function showStatus(message, type) {
-            const box = document.getElementById('status-box');
-            box.innerHTML = message;
-            box.className = `status ${type === 'error' ? 'error-box' : 'success-box'}`;
-            box.style.display = 'block';
-        }
     </script>
+
 </body>
 </html>
