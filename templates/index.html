@@ -3,191 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All Media Downloader Pro</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <title>All Media Downloader</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-        body {
-            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-            color: #fff;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        .container {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 30px;
-            border-radius: 15px;
-            width: 100%;
-            max-width: 500px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        h2 {
-            margin-bottom: 10px;
-            font-size: 24px;
-            color: #00e5ff;
-        }
-        p.subtitle {
-            font-size: 14px;
-            color: #ccc;
-            margin-bottom: 25px;
-        }
-        input {
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 8px;
-            outline: none;
-            font-size: 16px;
-            margin-bottom: 15px;
-            background: rgba(255, 255, 255, 0.9);
-            color: #333;
-        }
-        button {
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 8px;
-            background: #00e5ff;
-            color: #000;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.3s ease;
-        }
-        button:hover {
-            background: #00b8cc;
-        }
-        #loader {
-            display: none;
-            margin-top: 20px;
-            font-size: 16px;
-            color: #ffeb3b;
-        }
-        #result {
-            margin-top: 25px;
-            display: none;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 20px;
-            border-radius: 10px;
-        }
-        .cover-img {
-            width: 100%;
-            max-height: 250px;
-            object-fit: cover;
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
-        .video-title {
-            font-size: 14px;
-            margin-bottom: 15px;
-            color: #eee;
-        }
-        .download-btn {
-            display: block;
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 10px;
-            background: #4caf50;
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: 0.3s;
-        }
-        .download-btn:hover { background: #45a049; }
-        .audio-btn { background: #ff9800; }
-        .audio-btn:hover { background: #e68a00; }
-        .error-msg { color: #ff4c4c; font-weight: 600; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .container { background: #fff; max-width: 500px; width: 100%; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); padding: 30px; text-align: center; }
+        .header { margin-bottom: 25px; }
+        .header h1 { color: #4a4a4a; font-size: 24px; margin-bottom: 10px; }
+        .header p { color: #777; font-size: 14px; }
+        .input-group { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; }
+        input { width: 100%; padding: 15px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; outline: none; transition: border 0.3s; }
+        input:focus { border-color: #667eea; }
+        button.fetch-btn { background: #667eea; color: white; border: none; padding: 15px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.3s; width: 100%; }
+        button.fetch-btn:hover { background: #5a6fe0; }
+        
+        /* Loader */
+        .loader { display: none; margin: 20px 0; font-weight: bold; color: #667eea; }
+        .loader i { animation: spin 2s linear infinite; font-size: 24px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Results Section */
+        .result-box { display: none; margin-top: 20px; text-align: left; background: #f9f9f9; padding: 15px; border-radius: 10px; border: 1px solid #eee; }
+        .thumbnail { width: 100%; border-radius: 8px; margin-bottom: 15px; object-fit: cover; max-height: 250px; }
+        .video-title { font-size: 16px; font-weight: bold; color: #333; margin-bottom: 15px; word-wrap: break-word; }
+        
+        /* Download Buttons */
+        .download-btns { display: flex; flex-direction: column; gap: 10px; }
+        .dl-btn { text-decoration: none; display: flex; justify-content: space-between; align-items: center; background: #28a745; color: white; padding: 12px 15px; border-radius: 8px; font-weight: bold; transition: background 0.3s; }
+        .dl-btn:hover { background: #218838; }
+        .dl-btn.audio { background: #ffc107; color: #333; }
+        .dl-btn.audio:hover { background: #e0a800; }
+        
+        .error-msg { color: red; font-weight: bold; display: none; margin-top: 15px; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h2>🔥 All Media Downloader</h2>
-        <p class="subtitle">Download from TikTok, FB, IG, YouTube & X</p>
-
-        <input type="url" id="videoUrl" placeholder="Paste your video link here...">
-        <button onclick="fetchMedia()">Get Download Links</button>
-
-        <div id="loader">⏳ Wait bro, fetching data...</div>
-
-        <div id="result">
-            <!-- Data will be injected here by JS -->
-        </div>
+<div class="container">
+    <div class="header">
+        <h1><i class="fas fa-cloud-download-alt"></i> All Media Downloader</h1>
+        <p>Download Videos from Instagram, YouTube, Facebook & TikTok</p>
     </div>
 
-    <script>
-        // আপনার Vercel API এর লিংক
-        const API_BASE_URL = "https://all-media-api.vercel.app/api/download?url=";
+    <div class="input-group">
+        <input type="text" id="videoUrl" placeholder="Paste your video link here...">
+        <button class="fetch-btn" onclick="fetchVideo()">Get Download Links</button>
+    </div>
 
-        async function fetchMedia() {
-            const urlInput = document.getElementById("videoUrl").value.trim();
-            const resultDiv = document.getElementById("result");
-            const loader = document.getElementById("loader");
+    <!-- Loading Animation -->
+    <div class="loader" id="loader">
+        <i class="fas fa-spinner"></i> <br><br>Processing video... Please wait.
+    </div>
 
-            // যদি ইনপুট খালি থাকে
-            if (!urlInput) {
-                alert("Bro, please paste a valid link first!");
-                return;
-            }
+    <!-- Error Message -->
+    <div class="error-msg" id="errorMsg">Failed to fetch video. Check link or try again.</div>
 
-            // লোডার দেখানো এবং আগের রেজাল্ট হাইড করা
-            loader.style.display = "block";
-            resultDiv.style.display = "none";
-            resultDiv.innerHTML = "";
+    <!-- Result Area -->
+    <div class="result-box" id="resultBox">
+        <img src="" id="thumb" class="thumbnail" alt="Video Thumbnail">
+        <div class="video-title" id="title">Video Title</div>
+        
+        <div class="download-btns" id="downloadBtns">
+            <!-- Buttons will be generated here by JavaScript -->
+        </div>
+    </div>
+</div>
 
-            try {
-                // আপনার API তে রিকোয়েস্ট পাঠানো
-                const response = await fetch(API_BASE_URL + encodeURIComponent(urlInput));
-                const data = await response.json();
-
-                loader.style.display = "none";
-                resultDiv.style.display = "block";
-
-                if (data.success) {
-                    const media = data.data;
-                    
-                    // টিকটকের জন্য ডিজাইন
-                    if (media.platform === "TikTok") {
-                        resultDiv.innerHTML = `
-                            ${media.cover_image ? `<img src="${media.cover_image}" class="cover-img" alt="Cover">` : ''}
-                            <div class="video-title">${media.title || 'TikTok Video'}</div>
-                            
-                            <a href="${media.video_no_watermark}" target="_blank" class="download-btn">🎬 Download (No Watermark)</a>
-                            <a href="${media.video_watermark}" target="_blank" class="download-btn" style="background: #2196F3;">💧 Download (With Watermark)</a>
-                            ${media.music_url ? `<a href="${media.music_url}" target="_blank" class="download-btn audio-btn">🎵 Download Audio (MP3)</a>` : ''}
-                        `;
-                    } 
-                    // অন্যান্য সাইটের (FB/IG/YT) জন্য ডিজাইন
-                    else {
-                        resultDiv.innerHTML = `
-                            <div class="video-title">Ready to download!</div>
-                            <a href="${media.video_url}" target="_blank" class="download-btn">⬇️ Download Video</a>
-                        `;
-                    }
-                } else {
-                    // API থেকে Error আসলে
-                    resultDiv.innerHTML = `<p class="error-msg">❌ Error: ${data.message || 'Failed to fetch video!'}</p>`;
-                }
-            } catch (error) {
-                // নেটওয়ার্ক বা সার্ভার Error
-                loader.style.display = "none";
-                resultDiv.style.display = "block";
-                resultDiv.innerHTML = `<p class="error-msg">❌ Server error! Please try again later.</p>`;
-            }
+<script>
+    async function fetchVideo() {
+        const urlInput = document.getElementById('videoUrl').value.trim();
+        if (!urlInput) {
+            alert('Please enter a valid video URL!');
+            return;
         }
-    </script>
+
+        // UI Updates
+        document.getElementById('resultBox').style.display = 'none';
+        document.getElementById('errorMsg').style.display = 'none';
+        document.getElementById('loader').style.display = 'block';
+        document.getElementById('downloadBtns').innerHTML = '';
+
+        // Tumar Render API Link
+        const apiUrl = `https://all-media-api-1.onrender.com/api/download?url=${encodeURIComponent(urlInput)}`;
+
+        try {
+            const response = await fetch(apiUrl);
+            const data = await response.json();
+
+            document.getElementById('loader').style.display = 'none';
+
+            if (data.success) {
+                // Show Result Box
+                document.getElementById('resultBox').style.display = 'block';
+                
+                // Set Thumbnail and Title
+                document.getElementById('thumb').src = data.thumbnail || 'https://via.placeholder.com/500x250?text=No+Thumbnail';
+                document.getElementById('title').innerText = data.title;
+
+                // Create Download Buttons
+                const links = data.links;
+                const btnContainer = document.getElementById('downloadBtns');
+
+                // Helper function to create buttons
+                const createBtn = (label, url, isAudio = false) => {
+                    if(url && url !== "Not Found") {
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.target = '_blank'; // Opens link in new tab to download/play
+                        a.className = `dl-btn ${isAudio ? 'audio' : ''}`;
+                        a.innerHTML = `<span>${label}</span> <i class="fas fa-download"></i>`;
+                        btnContainer.appendChild(a);
+                    }
+                };
+
+                // Add Buttons (360p, 480p, 720p, Audio)
+                // Removing duplicates (karon Instagram e eki link ashte pare)
+                const uniqueLinks = new Set();
+
+                const addUniqueBtn = (label, url, isAudio) => {
+                    if (url && url !== "Not Found" && !uniqueLinks.has(url)) {
+                        uniqueLinks.add(url);
+                        createBtn(label, url, isAudio);
+                    }
+                };
+
+                addUniqueBtn('Download 720p (Best)', links['720p'], false);
+                addUniqueBtn('Download 480p', links['480p'], false);
+                addUniqueBtn('Download 360p', links['360p'], false);
+                
+                // Audio button
+                if (links['audio_high'] && links['audio_high'] !== "Not Found") {
+                    createBtn('Download Audio (MP3/M4A)', links['audio_high'], true);
+                }
+
+            } else {
+                document.getElementById('errorMsg').style.display = 'block';
+                document.getElementById('errorMsg').innerText = data.error || "Failed to find video.";
+            }
+        } catch (error) {
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('errorMsg').style.display = 'block';
+            document.getElementById('errorMsg').innerText = "Server Error. Please wait or check your network.";
+        }
+    }
+</script>
 
 </body>
 </html>
